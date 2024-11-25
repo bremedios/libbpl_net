@@ -4,6 +4,6 @@ project(netproj)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_subdirectory(libnet)
+add_subdirectory(libbpl_net)
 add_subdirectory(test_udpserver)
 add_subdirectory(test_udpclient)
