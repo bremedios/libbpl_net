@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#define __ENABLE_NET_DEBUG    1
+//#define __ENABLE_NET_DEBUG    1
 
 #define ERROR_MSG(msg)  { std::cerr << __PRETTY_FUNCTION__ << ":" << msg << std::endl; }
 
