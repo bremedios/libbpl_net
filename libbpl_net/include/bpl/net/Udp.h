@@ -5,28 +5,31 @@
 #ifndef BPL_NET_UDP_H
 #define BPL_NET_UDP_H
 
-#include <string>
 #include <bits/stdc++.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <unistd.h>
 
-#include "bpl/net/AddrInfo.h"
+#include <bpl/net/AddrInfo.h>
+#include <bpl/net/Packet.h>
 
 namespace bpl::net {
     class Udp {
     public:
         ~Udp();
 
-        bool OpenSocket();
-        bool Bind(uint16_t port);
+        [[nodiscard]] bool OpenSocket();
+        [[nodiscard]] bool Bind(uint16_t port);
         void Close();
-        size_t Recv(char* buffer,  uint32_t bufferSize, AddrInfo& addr);
-        size_t Send(const char* buffer, size_t bufferSize, const AddrInfo& addr);
+
+        [[nodiscard]] bool Recv(PacketPtr& packet, AddrInfo& addr) const;
+        [[nodiscard]] bool Send(const PacketPtr& packet, const AddrInfo& addr) const;
+
+        [[nodiscard]] size_t Recv(char* buffer,  uint32_t bufferSize, AddrInfo& addr) const;
+        [[nodiscard]] size_t Send(const char* buffer, size_t bufferSize, const AddrInfo& addr) const ;
     private:
 
         int m_socket=-1;
     }; // Udp
+
+    typedef std::shared_ptr<Udp> UdpPtr;
 } // bpl::net
 
 #endif //BPL_NET_UDP_H

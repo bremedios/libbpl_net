@@ -5,6 +5,7 @@
 #define BPL_NET_ADDRINFO_H
 
 #include <string>
+#include <netinet/in.h>
 
 namespace bpl::net {
     class AddrInfo{
@@ -14,17 +15,17 @@ namespace bpl::net {
         AddrInfo();
 
         void setPort(unsigned short port);
-        unsigned short getPort();
+        [[nodiscard]] unsigned short getPort() const;
 
-        bool FromIp(const std::string& ip);
-        const std::string& getIp();
+        [[nodiscard]] bool FromIp(const std::string& ip);
+        [[nodiscard]] std::string getIp() const;
         void Reset();
 
         struct sockaddr_in& getAddr() { return m_addr;}
 
     private:
         std::string        m_ip;
-        struct sockaddr_in m_addr;
+        struct sockaddr_in m_addr={0};
         socklen_t          m_addrLen=sizeof(m_addr);
 
     };

@@ -4,6 +4,8 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include <iostream>
+
 //#define __ENABLE_NET_DEBUG    1
 
 #define ERROR_MSG(msg)  { std::cerr << __PRETTY_FUNCTION__ << ":" << msg << std::endl; }
