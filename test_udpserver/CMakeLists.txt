@@ -8,4 +8,4 @@ set(CMAKE_CXX_STANDARD 20)
 include_directories(../libbpl_net/include)
 add_executable(test_udpserver main.cpp)
 
-target_link_libraries(test_udpserver PRIVATE net)
+target_link_libraries(test_udpserver PRIVATE bpl_net)

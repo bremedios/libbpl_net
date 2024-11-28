@@ -12,11 +12,19 @@ int main(int argc, char *argv[]) {
     bpl::net::Udp udp;
     uint32_t data=19;
 
-    addr.FromIp("127.0.0.1");
+    if (!addr.FromIp("127.0.0.1")) {
+        std::cerr << "Failed to parse server address." << std::endl;
+
+        return -1;
+    }
     addr.setPort(9999);
 
     if (argc > 1) {
-        addr.FromIp(argv[1]);
+        if (!addr.FromIp(argv[1])) {
+            std::cerr << "Failed to parse server address." << std::endl;
+
+            return -1;
+        }
     }
     if (argc > 2) {
         addr.setPort(atoi(argv[2]));
