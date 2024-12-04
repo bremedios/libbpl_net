@@ -8,7 +8,7 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 find_package(CURL REQUIRED)
 
-include_directories(include)
+include_directories(include "../../libbpl_storage/libbpl_storage/include")
 
 set(PUBLIC_HEADER include/bpl/net/Http.h
         include/bpl/net/Udp.h
@@ -20,6 +20,7 @@ set(PUBLIC_HEADER include/bpl/net/Http.h
 set(SOURCE_FILES src/Http.cpp src/Udp.cpp src/AddrInfo.cpp src/Packet.cpp src/PacketCache.cpp src/UdpPacketProcessor.cpp)
 
 add_library(bpl_net SHARED ${SOURCE_FILES} ${PUBLIC_HEADER} )
+target_link_directories(bpl_net PRIVATE "../../cmake-build-debug/libbpl_storage/libbpl_storage")
 target_link_libraries(bpl_net PRIVATE ${CURL_LIBRARIES} bpl_storage)
 
 install(TARGETS bpl_net DESTINATION lib)
