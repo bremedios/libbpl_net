@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
+#find_library(bpl_storage REQUIRED)
 find_package(CURL REQUIRED)
 
 include_directories(include "../../libbpl_storage/libbpl_storage/include")
