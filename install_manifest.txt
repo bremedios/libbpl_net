@@ -1,0 +1,8 @@
+/home/bradr/workspace/bpl/output-x64/lib/libbpl_net.so
+/home/bradr/workspace/bpl/output-x64/include/bpl/net/Http.h
+/home/bradr/workspace/bpl/output-x64/include/bpl/net/Udp.h
+/home/bradr/workspace/bpl/output-x64/include/bpl/net/AddrInfo.h
+/home/bradr/workspace/bpl/output-x64/include/bpl/net/Packet.h
+/home/bradr/workspace/bpl/output-x64/include/bpl/net/PacketCache.h
+/home/bradr/workspace/bpl/output-x64/include/bpl/net/PacketOp.h
+/home/bradr/workspace/bpl/output-x64/include/bpl/net/UdpPacketProcessor.h
