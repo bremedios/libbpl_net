@@ -6,8 +6,9 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <cstddef>
+#include <poll.h>
 
-#include "bpl/net/Udp.h"
+#include <bpl/net/Udp.h>
 
 #include "Debug.h"
 
@@ -62,14 +63,14 @@ namespace bpl::net {
         }
     } // Close
 
-    bool Udp::Recv(PacketPtr& packet, AddrInfo& addrInfo) const {
+    bool Udp::Recv(PacketPtr& packet, AddrInfo& addrInfo, int timeout) const {
         if (!packet->isValid()) {
             ERROR_MSG("Invalid packet");
 
             return false;
         }
 
-        size_t dataRead = Recv((char*)packet->getPacketData(), packet->getMaxPacketSize(), addrInfo);
+        size_t dataRead = Recv((char*)packet->getPacketData(), packet->getMaxPacketSize(), addrInfo, timeout);
 
         if (-1 == dataRead) {
             packet->setPacketDataSize(0);
@@ -110,7 +111,9 @@ namespace bpl::net {
         return true;
     } // Send
 
-    size_t Udp::Recv(char* buffer,  uint32_t bufferSize, AddrInfo& addrInfo) const {
+    size_t Udp::Recv(char* buffer,  uint32_t bufferSize, AddrInfo& addrInfo, int timeout) const {
+        auto start = std::chrono::steady_clock::now();
+
         if (0 > m_socket) {
             ERROR_MSG("Socket not open");
 
@@ -119,17 +122,44 @@ namespace bpl::net {
 
         addrInfo.Reset();
 
-        size_t bytes = recvfrom(m_socket, buffer, bufferSize, 0, (struct sockaddr*)&addrInfo.m_addr, &addrInfo.m_addrLen);
+        while ((timeout < 0) || (timeout < std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count())) {
+            if (0 > m_socket) {
+                // socket closed.
+                return false;
+            }
 
-        if (bytes == -1) {
-            ERROR_MSG("recvfrom failed");
+            struct pollfd fds;
 
-            return -1;
+            fds.fd = m_socket;
+            fds.events = POLLIN | POLLNVAL;
+            fds.revents = 0;
+
+            if (0 > poll(&fds, 1, 500)) {
+                ERROR_MSG("Poll failed(" << errno << ")");
+
+                return -1;
+            }
+
+            if (0 > m_socket) {
+                // socket closed.
+                return false;
+            }
+
+            if (fds.revents & POLLIN) {
+                size_t bytes = recvfrom(m_socket, buffer, bufferSize, 0, (struct sockaddr*)&addrInfo.m_addr, &addrInfo.m_addrLen);
+
+                if (bytes == -1) {
+                    ERROR_MSG("recvfrom failed");
+
+                    return -1;
+                }
+                DEBUG_MSG("Received " << bytes << " bytes from " << addrInfo.getIp());
+
+                return bytes;
+            }
         }
 
-        DEBUG_MSG("Received " << bytes << " bytes from " << addrInfo.getIp());
-
-        return bytes;
+        return 0;
     } // Recv
 
     size_t Udp::Send(const char* buffer, size_t bufferSize, const AddrInfo& addrInfo) const {

@@ -19,10 +19,10 @@ namespace bpl::net {
         [[nodiscard]] bool Bind(uint16_t port);
         void Close();
 
-        [[nodiscard]] bool Recv(PacketPtr& packet, AddrInfo& addr) const;
+        [[nodiscard]] bool Recv(PacketPtr& packet, AddrInfo& addr, int timeout=-1) const;
         [[nodiscard]] bool Send(const PacketPtr& packet, const AddrInfo& addr) const;
 
-        [[nodiscard]] size_t Recv(char* buffer,  uint32_t bufferSize, AddrInfo& addr) const;
+        [[nodiscard]] size_t Recv(char* buffer,  uint32_t bufferSize, AddrInfo& addr, int timeout=-1) const;
         [[nodiscard]] size_t Send(const char* buffer, size_t bufferSize, const AddrInfo& addr) const ;
     private:
 
