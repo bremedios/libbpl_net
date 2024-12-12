@@ -28,6 +28,10 @@ namespace bpl::net {
 
         m_socket = socket(AF_INET, SOCK_DGRAM, 0);
 
+        if (0 > m_socket) {
+            ERROR_MSG("socket(AF_INET, SOCK_DGRAM, ...) failed: " << strerror(errno))
+        }
+
         return true;
     } // OpenSocket
 
@@ -47,7 +51,7 @@ namespace bpl::net {
         addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
         if (bind(m_socket, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
-            ERROR_MSG("Failed to bind socket");
+            ERROR_MSG("bind(...) failed: " << strerror(errno));
 
             return false;
         }
@@ -135,7 +139,7 @@ namespace bpl::net {
             fds.revents = 0;
 
             if (0 > poll(&fds, 1, 500)) {
-                ERROR_MSG("Poll failed(" << errno << ")");
+                ERROR_MSG("poll(...) failed: " << strerror(errno));
 
                 return -1;
             }
@@ -149,7 +153,7 @@ namespace bpl::net {
                 size_t bytes = recvfrom(m_socket, buffer, bufferSize, 0, (struct sockaddr*)&addrInfo.m_addr, &addrInfo.m_addrLen);
 
                 if (bytes == -1) {
-                    ERROR_MSG("recvfrom failed");
+                    ERROR_MSG("recvfrom(...) failed: " << strerror(errno));
 
                     return -1;
                 }
@@ -174,7 +178,7 @@ namespace bpl::net {
         ssize_t sent = sendto(m_socket, buffer, bufferSize, 0, (const sockaddr*)&addrInfo.m_addr, addrInfo.m_addrLen);
 
         if (sent == -1) {
-            ERROR_MSG("Failed to send");
+            ERROR_MSG("sendto(...) failed: " << strerror(errno));
 
             return sent;
         }
