@@ -4,8 +4,9 @@
 
 #include "bpl/net/Http.h"
 
-#include <cstring>
 #include <iostream>
+
+#include "Debug.h"
 
 namespace bpl::net {
     Http::Http() = default;
@@ -16,7 +17,7 @@ namespace bpl::net {
 
     bool Http::Create() {
         if (nullptr != m_curl) {
-            std::cerr << "Http::Create: Curl already exists, cannot recreate" << std::endl;
+            ERROR_MSG("Curl already exists, cannot recreate");
 
             return false;
         }
@@ -24,7 +25,8 @@ namespace bpl::net {
         m_curl = curl_easy_init();
 
         if (nullptr == m_curl) {
-            std::cerr << "Http::Create: curl_easy_init failed" << std::endl;
+            ERROR_MSG("curl_easy_init() failed: " << curl_easy_strerror(m_result));
+
             return false;
         }
 
@@ -50,8 +52,8 @@ namespace bpl::net {
         m_result = curl_easy_perform(m_curl);
 
         if (CURLE_OK != m_result) {
-            std::cerr << "Http::Get: curl_easy_perform failed: " << curl_easy_strerror(m_result) << std::endl;
-            std::cerr << "Http::Get:     url: " << url << std::endl;
+            ERROR_MSG("Http::Get: curl_easy_perform failed: " << curl_easy_strerror(m_result));
+            ERROR_MSG("Http::Get:     url: " << url);
 
             return false;
         }
@@ -59,14 +61,13 @@ namespace bpl::net {
         return true;
     } // Get
 
-
     size_t Http::WriteCallback_(const char* data, size_t size, size_t nmemb) {
         if ((0 == size) || (nullptr == data) || (0 == nmemb)) {
             return 0;
         }
 
         if (!m_payload.CopyChunk(data, size*nmemb)) {
-            std::cerr << "Http::WriteCallback_: Failed to copy chunk data" << std::endl;
+            ERROR_MSG("Failed to copy chunk data");
 
             return 0;
         }

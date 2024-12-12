@@ -25,9 +25,8 @@ namespace bpl::net {
 
     private:
         std::string        m_ip;
-        struct sockaddr_in m_addr={0};
-        socklen_t          m_addrLen=sizeof(m_addr);
-
+        struct sockaddr_in m_addr       = {0};
+        socklen_t          m_addrLen    = sizeof(m_addr);
     };
 } // bpl::net
 

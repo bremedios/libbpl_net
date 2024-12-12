@@ -27,7 +27,7 @@ namespace bpl::net {
             return true;
         }
 
-        ERROR_MSG("inet_pton failed to convert IP \"" << ip << "\" to network address");
+        ERROR_MSG("inet_pton failed to convert IP \"" << ip << "\" to network address: " << strerror(errno));
 
         return false;
     } // FromIp
@@ -36,7 +36,7 @@ namespace bpl::net {
         char str[INET6_ADDRSTRLEN];
 
         if (nullptr == inet_ntop(AF_INET, &m_addr.sin_addr, str, INET_ADDRSTRLEN)) {
-            ERROR_MSG("inet_ntop failed");
+            ERROR_MSG("inet_ntop failed: " << strerror(errno));
 
             return m_ip;
         }
@@ -51,4 +51,4 @@ namespace bpl::net {
     unsigned short AddrInfo::getPort() const {
         return ntohs(m_addr.sin_port);
     } // getPort
-} //
+}; // bpl::net

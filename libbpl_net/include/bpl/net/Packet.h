@@ -21,7 +21,7 @@ namespace bpl::net {
         void setPacketDataSize(size_t size) { m_packetSize = size; }
         [[nodiscard]] size_t getPacketSize() const { return m_packetSize; }
         [[nodiscard]] size_t getMaxPacketSize() const { return m_maxPacketSize; }
-        void* getPacketData() { return (void*)m_packetData; }
+        [[nodiscard]] void* getPacketData() { return (void*)m_packetData; }
 
     private:
         char* m_packetData = nullptr;

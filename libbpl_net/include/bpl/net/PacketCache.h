@@ -17,7 +17,7 @@ namespace bpl::net {
         ~PacketCache();
 
         void Push(const PacketPtr& packet);
-        PacketPtr Pop();
+        [[nodiscard]] PacketPtr Pop();
 
         [[nodiscard]] size_t getMaxPackets() const { return m_maxPackets; }
         void setMaxPackets(size_t maxPackets) { m_maxPackets = maxPackets; }
@@ -25,12 +25,11 @@ namespace bpl::net {
         [[nodiscard]] size_t getMaxPacketSize() const { return m_maxPacketSize; }
         void setMaxPacketSzie(size_t maxPacketSize) { m_maxPacketSize = maxPacketSize; }
     private:
-        std::list<std::shared_ptr<Packet>> m_packets;
-        std::mutex m_lock;
+        std::list<std::shared_ptr<Packet>>  m_packets;
+        std::mutex                          m_lock;
 
-        size_t m_maxPackets=100;
-        size_t m_maxPacketSize=4096;
-
+        size_t m_maxPackets     = 100;
+        size_t m_maxPacketSize  = 4096;
     }; // class PacketCache
 
     typedef std::shared_ptr<PacketCache> PacketCachePtr;
