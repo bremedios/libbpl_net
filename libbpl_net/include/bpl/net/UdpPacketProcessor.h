@@ -25,7 +25,7 @@ namespace bpl::net {
         //
         //  WARNING:
         //      Once packet is passed to this function it will be kept/disposed of as needed.
-        [[nodiscard]] bool ProcessPacket(bpl::net::PacketPtr packet, const bpl::net::AddrInfo& addr);
+        [[nodiscard]] bool ProcessPacket(bpl::net::PacketPtr& packet, const bpl::net::AddrInfo& addr);
 
         //  returns false if packet op is already registered.
         void AddPacketOp(PacketOpPtr packetOp);

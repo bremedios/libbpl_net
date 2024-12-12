@@ -24,10 +24,10 @@ namespace bpl::net {
         m_packetOps.clear();
     }
 
-    bool UdpPacketProcessor::ProcessPacket(bpl::net::PacketPtr packet, const bpl::net::AddrInfo& addr) {
+    bool UdpPacketProcessor::ProcessPacket(bpl::net::PacketPtr& packet, const bpl::net::AddrInfo& addr) {
         PacketOpPtr op;
 
-        // we don't process but we look for a match.  We do not want to hold the lock for too long.
+        // we don't process, but we look for a match.  We do not want to hold the lock for too long.
         {
             std::lock_guard<std::mutex> guard(m_lock);
             for (auto it : std::views::values(m_packetOps)) {
