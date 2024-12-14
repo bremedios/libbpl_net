@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <cstddef>
 #include <poll.h>
+#include <unistd.h>
 
 #include <bpl/net/Udp.h>
 
@@ -26,11 +27,24 @@ namespace bpl::net {
 
         DEBUG_MSG("Opening IPv4 DGRAM Socket");
 
-        m_socket = socket(AF_INET, SOCK_DGRAM, 0);
+        m_socket = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
 
         if (0 > m_socket) {
             ERROR_MSG("socket(AF_INET, SOCK_DGRAM, ...) failed: " << strerror(errno))
+
+            return false;
         }
+
+        int fds[2];
+
+        if (0 != pipe(fds)) {
+            ERROR_MSG("pipe() failed: " << strerror(errno));
+
+            return false;
+        }
+
+        m_fifoRead = fds[0];
+        m_fifoWrite = fds[1];
 
         return true;
     } // OpenSocket
@@ -65,6 +79,14 @@ namespace bpl::net {
 
             m_socket = -1;
         }
+
+        char buf[1]={0};
+
+        // write to our pipe to unblock the poll call and have a quicker return.
+        write(m_fifoWrite, buf, 1);
+
+        close(m_fifoRead);
+        close(m_fifoWrite);
     } // Close
 
     bool Udp::Recv(PacketPtr& packet, AddrInfo& addrInfo, int timeout) const {
@@ -132,13 +154,16 @@ namespace bpl::net {
                 return false;
             }
 
-            struct pollfd fds;
+            struct pollfd fds[2];
 
-            fds.fd = m_socket;
-            fds.events = POLLIN | POLLNVAL;
-            fds.revents = 0;
+            fds[0].fd = m_socket;
+            fds[0].events = POLLIN | POLLNVAL;
+            fds[0].revents = 0;
+            fds[1].fd = m_fifoRead;
+            fds[1].events = POLLIN | POLLNVAL;
+            fds[1].revents = 0;
 
-            if (0 > poll(&fds, 1, 500)) {
+            if (0 > poll(fds, 2, 20000)) {
                 ERROR_MSG("poll(...) failed: " << strerror(errno));
 
                 return -1;
@@ -149,8 +174,8 @@ namespace bpl::net {
                 return false;
             }
 
-            if (fds.revents & POLLIN) {
-                size_t bytes = recvfrom(m_socket, buffer, bufferSize, 0, (struct sockaddr*)&addrInfo.m_addr, &addrInfo.m_addrLen);
+            if (fds[0].revents & POLLIN) {
+                size_t bytes = recvfrom(m_socket, buffer, bufferSize, MSG_DONTWAIT, (struct sockaddr*)&addrInfo.m_addr, &addrInfo.m_addrLen);
 
                 if (bytes == -1) {
                     ERROR_MSG("recvfrom(...) failed: " << strerror(errno));

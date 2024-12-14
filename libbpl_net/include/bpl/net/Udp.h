@@ -26,6 +26,8 @@ namespace bpl::net {
         [[nodiscard]] size_t Send(const char* buffer, size_t bufferSize, const AddrInfo& addr) const ;
     private:
 
+        int m_fifoWrite=-1;
+        int m_fifoRead=-1;
         int m_socket=-1;
     }; // Udp
 
